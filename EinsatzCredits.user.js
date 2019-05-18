@@ -25,33 +25,68 @@
         980, 980, 3700, 400, 980, 110, 5900, 3000, 2500, 3000, 200, 0, 0, 400, 4500, 0, 800, 400, 1300, 8600, 0, 0, 0, 1500, 3100, 7000, 0, 1700, 6000, 5800, 6000, 400, 400, 2000, 8000, 0, 1600, 1000, 2200, 1000, 400, 2000, 3000, 100, 2100, 2200, 2000
         ];
 
-    // Missions-Liste auslesen (eigene Einsätze)
-    var ownMissions = $("#mission_list .missionSideBarEntry");
+    // initial call of adding info
+    show_existing_missions();
 
-    for (var oi = 0; oi < ownMissions.length; oi++)
-    {
-        // first get mission_type_id to get the credits
-        var o_mission_type = ownMissions[oi].getAttribute('mission_type_id');
-        var o_credits = aCredits[o_mission_type];
-        var o_str = 'Durchschnittliche Credits: ' + o_credits;
-        var o_temp = document.createElement('div');
-        o_temp.innerHTML = o_str;
+    // extend missionMarkerAdd -----------------------------------------------------------------------
+    var original_func = missionMarkerAdd;
 
-        ownMissions[oi].firstElementChild.firstElementChild.appendChild(o_temp);
+    // this function is always called, when a new mission is added
+    missionMarkerAdd = function(e) {
+        original_func.apply(this, arguments);
+
+        show_existing_missions();
     }
 
-    // Missions-Liste auslesen (Verbands-Einsätze)
-    var allianceMissions = $("#mission_list_alliance .missionSideBarEntry");
-
-    for (var ai = 0; ai < allianceMissions.length; ai++)
+    // this function shows the credits information at initial loading of the page
+    function show_existing_missions()
     {
-        var a_mission_type = allianceMissions[ai].getAttribute('mission_type_id');
-        var a_credits = aCredits[a_mission_type];
-        var a_str = 'Durchschnittliche Credits: ' + a_credits;
-        var a_temp = document.createElement('div');
-        a_temp.innerHTML = a_str;
+        var user_Missions = $("#mission_list .missionSideBarEntry");
+        var alliance_Missions = $("#mission_list_alliance .missionSideBarEntry");
 
-        allianceMissions[ai].firstElementChild.firstElementChild.appendChild(a_temp);
+        // add info for own missions
+        for (var u_i = 0; u_i < user_Missions.length; u_i++)
+        {
+            var u_str = 'Durchschnittl. ' + aCredits[user_Missions[u_i].getAttribute('mission_type_id')] + ' Credits';
+            var u_div = document.createElement('div');
+            u_div.innerHTML = u_str;
+
+            var user_Missions_childs = user_Missions[u_i].firstElementChild.firstElementChild.childNodes;
+
+            for(var u_child_i = 0; u_child_i < user_Missions_childs.length; u_child_i++)
+            {
+                if(user_Missions_childs[u_child_i].nodeName == "DIV")
+                {
+                    var u_child = user_Missions_childs[u_child_i];
+                    user_Missions[u_i].firstElementChild.firstElementChild.removeChild(u_child);
+                }
+            }
+
+            user_Missions[u_i].firstElementChild.firstElementChild.appendChild(u_div);
+
+        }
+
+        // add info for alliance missions
+        for (var a_i = 0; a_i < alliance_Missions.length; a_i++)
+        {
+            var a_str = 'Durchschnittl. ' + aCredits[alliance_Missions[a_i].getAttribute('mission_type_id')] + ' Credits';
+            var a_div = document.createElement('div');
+            a_div.innerHTML = a_str;
+
+            var alliance_Missions_childs = alliance_Missions[a_i].firstElementChild.firstElementChild.childNodes;
+
+            for(var a_child_i = 0; a_child_i < alliance_Missions_childs.length; a_child_i++)
+            {
+                if(alliance_Missions_childs[a_child_i].nodeName == 'DIV')
+                {
+                    var a_child = alliance_Missions_childs[a_child_i];
+                    alliance_Missions[a_i].firstElementChild.firstElementChild.removeChild(a_child);
+                }
+            }
+
+            alliance_Missions[a_i].firstElementChild.firstElementChild.appendChild(a_div);
+        }
+
     }
 
 })();
