@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EinsatzCredits
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.01
 // @description  Dieses Script zeigt zu jedem Einsatz (außer geplante) an, wie viele Credits man im Durchschnitt bekommt
 // @author       itsDreyter
 // @match        https://www.leitstellenspiel.de/
@@ -50,12 +50,13 @@
             var u_str = 'Durchschnittl. ' + aCredits[user_Missions[u_i].getAttribute('mission_type_id')] + ' Credits';
             var u_div = document.createElement('div');
             u_div.innerHTML = u_str;
+            u_div.setAttribute("id", "credits");
 
             var user_Missions_childs = user_Missions[u_i].firstElementChild.firstElementChild.childNodes;
 
             for(var u_child_i = 0; u_child_i < user_Missions_childs.length; u_child_i++)
             {
-                if(user_Missions_childs[u_child_i].nodeName == "DIV")
+                if(user_Missions_childs[u_child_i].id == "credits")
                 {
                     var u_child = user_Missions_childs[u_child_i];
                     user_Missions[u_i].firstElementChild.firstElementChild.removeChild(u_child);
@@ -72,12 +73,13 @@
             var a_str = 'Durchschnittl. ' + aCredits[alliance_Missions[a_i].getAttribute('mission_type_id')] + ' Credits';
             var a_div = document.createElement('div');
             a_div.innerHTML = a_str;
+            a_div.setAttribute("id", "credits");
 
             var alliance_Missions_childs = alliance_Missions[a_i].firstElementChild.firstElementChild.childNodes;
 
             for(var a_child_i = 0; a_child_i < alliance_Missions_childs.length; a_child_i++)
             {
-                if(alliance_Missions_childs[a_child_i].nodeName == 'DIV')
+                if(alliance_Missions_childs[a_child_i].id == 'credits')
                 {
                     var a_child = alliance_Missions_childs[a_child_i];
                     alliance_Missions[a_i].firstElementChild.firstElementChild.removeChild(a_child);
