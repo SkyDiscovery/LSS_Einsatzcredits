@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EinsatzCredits
 // @namespace    http://tampermonkey.net/
-// @version      1.01
+// @version      1.1
 // @description  Dieses Script zeigt zu jedem Einsatz (außer geplante) an, wie viele Credits man im Durchschnitt bekommt
 // @author       itsDreyter
 // @match        https://www.leitstellenspiel.de/
@@ -26,7 +26,7 @@
         ];
 
     // initial call of adding info
-    show_existing_missions();
+    show_credits();
 
     // extend missionMarkerAdd -----------------------------------------------------------------------
     var original_func = missionMarkerAdd;
@@ -35,60 +35,55 @@
     missionMarkerAdd = function(e) {
         original_func.apply(this, arguments);
 
-        show_existing_missions();
+        show_credits();
     }
 
     // this function shows the credits information at initial loading of the page
-    function show_existing_missions()
+    function show_credits(e)
     {
-        var user_Missions = $("#mission_list .missionSideBarEntry");
-        var alliance_Missions = $("#mission_list_alliance .missionSideBarEntry");
 
-        // add info for own missions
-        for (var u_i = 0; u_i < user_Missions.length; u_i++)
+        $('.missionCredits').remove();
+
+        // get complete mission list
+        var Missions = $('.missionSideBarEntry');
+
+        // add info to every mission
+        for (var i = 0; i < Missions.length; i++)
         {
-            var u_str = 'Durchschnittl. ' + aCredits[user_Missions[u_i].getAttribute('mission_type_id')] + ' Credits';
-            var u_div = document.createElement('div');
-            u_div.innerHTML = u_str;
-            u_div.setAttribute("id", "credits");
+            // init credits
+            var credits = 0;
 
-            var user_Missions_childs = user_Missions[u_i].firstElementChild.firstElementChild.childNodes;
+            // init html string
+            var html_str = '';
 
-            for(var u_child_i = 0; u_child_i < user_Missions_childs.length; u_child_i++)
+            // get credits for mission type
+            if (e != undefined)
             {
-                if(user_Missions_childs[u_child_i].id == "credits")
+                if (e.id == Missions[i].getAttribute('mission_type_id'))
                 {
-                    var u_child = user_Missions_childs[u_child_i];
-                    user_Missions[u_i].firstElementChild.firstElementChild.removeChild(u_child);
+                    if (e.mtid != undefined) get_credits_for_type(e.mtid);
+                    else credits = get_credits_for_type(Missions[i].getAttribute('mission_type_id'));
                 }
             }
+            else credits = get_credits_for_type(Missions[i].getAttribute('mission_type_id'));
 
-            user_Missions[u_i].firstElementChild.firstElementChild.appendChild(u_div);
+            // create div element
+            if (credits == 0) html_str = 'RD-Vergütung';
+            else html_str = 'Durchschnittl. ' + credits + ' Credits';
 
+            var div_elem = document.createElement('div');
+            div_elem.innerHTML = html_str;
+            div_elem.setAttribute("class", "missionCredits");
+
+            // add div element
+            Missions[i].firstElementChild.firstElementChild.appendChild(div_elem);
         }
+    }
 
-        // add info for alliance missions
-        for (var a_i = 0; a_i < alliance_Missions.length; a_i++)
-        {
-            var a_str = 'Durchschnittl. ' + aCredits[alliance_Missions[a_i].getAttribute('mission_type_id')] + ' Credits';
-            var a_div = document.createElement('div');
-            a_div.innerHTML = a_str;
-            a_div.setAttribute("id", "credits");
-
-            var alliance_Missions_childs = alliance_Missions[a_i].firstElementChild.firstElementChild.childNodes;
-
-            for(var a_child_i = 0; a_child_i < alliance_Missions_childs.length; a_child_i++)
-            {
-                if(alliance_Missions_childs[a_child_i].id == 'credits')
-                {
-                    var a_child = alliance_Missions_childs[a_child_i];
-                    alliance_Missions[a_i].firstElementChild.firstElementChild.removeChild(a_child);
-                }
-            }
-
-            alliance_Missions[a_i].firstElementChild.firstElementChild.appendChild(a_div);
-        }
-
+    // returns the credits for a specific mission type
+    function get_credits_for_type(type)
+    {
+        return aCredits[type];
     }
 
 })();
