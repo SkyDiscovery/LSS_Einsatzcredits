@@ -2,7 +2,7 @@
 // @name         EinsatzCredits
 // @namespace    http://tampermonkey.net/
 // @version      1.101
-// @description  Dieses Script zeigt zu jedem Einsatz (außer geplante) an, wie viele Credits man im Durchschnitt bekommt
+// @description  Dieses Script zeigt zu jedem Einsatz an, wie viele Credits man im Durchschnitt bekommt
 // @author       itsDreyter
 // @match        https://www.leitstellenspiel.de/
 // @grant        none
