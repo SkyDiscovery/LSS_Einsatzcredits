@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EinsatzCredits
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.101
 // @description  Dieses Script zeigt zu jedem Einsatz (außer geplante) an, wie viele Credits man im Durchschnitt bekommt
 // @author       itsDreyter
 // @match        https://www.leitstellenspiel.de/
@@ -26,7 +26,7 @@
         ];
 
     // initial call of adding info
-    show_credits();
+    initial_setup();
 
     // extend missionMarkerAdd -----------------------------------------------------------------------
     var original_func = missionMarkerAdd;
@@ -35,13 +35,43 @@
     missionMarkerAdd = function(e) {
         original_func.apply(this, arguments);
 
-        show_credits();
+        update(e);
     }
 
     // this function shows the credits information at initial loading of the page
-    function show_credits(e)
+    function update(e)
     {
+        var Missions = $('.missionSideBarEntry');
 
+        // check all missions
+        for (var i = 0; i < Missions.length; i++)
+        {
+            var childs = Missions[i].firstElementChild.firstElementChild.children;
+
+            for (var i_c = 0; i_c < childs.length; i_c++)
+            {
+                if (childs[i_c].className != 'missionCredits') continue;
+
+                var id = 'missionCredits_' + Missions[i].getAttribute('mission_id');
+
+                if (e.id != id) continue;
+
+                if (e.mtid == undefined) continue;
+                debugger;
+
+                var child = childs[i_c];
+                Missions[i].firstElementChild.firstElementChild.removeChild(child);
+
+                child.innerHTML = 'Durchschnittl. ' + get_credits_for_type(e.mtid) + ' Credits';
+                Missions[i].firstElementChild.firstElementChild.appendChild(child);
+            }
+
+        }
+    }
+
+    function initial_setup()
+    {
+        // clear all
         $('.missionCredits').remove();
 
         // get complete mission list
@@ -57,15 +87,7 @@
             var html_str = '';
 
             // get credits for mission type
-            if (e != undefined)
-            {
-                if (e.id == Missions[i].getAttribute('mission_type_id'))
-                {
-                    if (e.mtid != undefined) get_credits_for_type(e.mtid);
-                    else credits = get_credits_for_type(Missions[i].getAttribute('mission_type_id'));
-                }
-            }
-            else credits = get_credits_for_type(Missions[i].getAttribute('mission_type_id'));
+            credits = get_credits_for_type(Missions[i].getAttribute('mission_type_id'));
 
             // create div element
             if (credits == 0) html_str = 'RD-Vergütung';
@@ -74,6 +96,7 @@
             var div_elem = document.createElement('div');
             div_elem.innerHTML = html_str;
             div_elem.setAttribute("class", "missionCredits");
+            div_elem.setAttribute("id", "missionCredits_" + Missions[i].getAttribute('mission_id'));
 
             // add div element
             Missions[i].firstElementChild.firstElementChild.appendChild(div_elem);
