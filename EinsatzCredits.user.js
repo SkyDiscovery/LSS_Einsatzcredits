@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EinsatzCredits
 // @namespace    http://tampermonkey.net/
-// @version      1.102
+// @version      1.2
 // @description  Dieses Script zeigt zu jedem Einsatz an, wie viele Credits man im Durchschnitt bekommt
 // @author       itsDreyter
 // @match        https://www.leitstellenspiel.de/
@@ -55,7 +55,7 @@
 
                 var id = 'missionCredits_' + Missions[i].getAttribute('mission_id');
 
-                if (e.id != id) continue;
+                if (e.id != Missions[i].getAttribute('mission_id')) continue;
 
                 if (e.mtid == undefined) continue;
 
@@ -72,20 +72,25 @@
                 for (var i2 = 0; i2 < Missions[i].firstElementChild.firstElementChild.children.length; i2++)
                 {
                     if ( Missions[i].firstElementChild.firstElementChild.children[i2].className != 'missionCredits') continue;
+                    if ( Missions[i].firstElementChild.firstElementCHild.children[i2].className == 'missionCredits') added = true;
 
-                    Missions[i].firstElementChild.firstElementChild.removeChild(Missions[i].firstElementChild.firstElementChild.children[i2]);
+                    //Missions[i].firstElementChild.firstElementChild.removeChild(Missions[i].firstElementChild.firstElementChild.children[i2]);
                 }
 
-                var div_elem = document.createElement('div');
-                var html_str = '';
+                if (added == false)
+                {
+                    var div_elem = document.createElement('div');
+                    var html_str = '';
 
-                if (get_credits_for_type(Missions[i].getAttribute('mission_type_id')) == 0) html_str = 'RD-Vergütung';
-                else html_str = 'Durchschnittl. ' + get_credits_for_type(Missions[i].getAttribute('mission_type_id')) + ' Credits';
+                    if (get_credits_for_type(Missions[i].getAttribute('mission_type_id')) == 0) html_str = 'RD-Vergütung';
+                    else html_str = 'Durchschnittl. ' + get_credits_for_type(Missions[i].getAttribute('mission_type_id')) + ' Credits';
 
-                div_elem.innerHTML = html_str;
-                div_elem.setAttribute("class", "missionCredits");
-                div_elem.setAttribute("id", "missionCredits_" + Missions[i].getAttribute('mission_id'));
-                Missions[i].firstElementChild.firstElementChild.appendChild(div_elem);
+                    div_elem.innerHTML = html_str;
+                    div_elem.setAttribute("class", "missionCredits");
+                    div_elem.setAttribute("id", "missionCredits_" + Missions[i].getAttribute('mission_id'));
+                    Missions[i].firstElementChild.firstElementChild.appendChild(div_elem);
+                }
+
             }
 
         }
