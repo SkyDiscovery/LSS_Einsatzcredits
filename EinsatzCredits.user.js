@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EinsatzCredits
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      2.1
 // @description  Dieses Script zeigt zu jedem Einsatz an, wie viele Credits man im Durchschnitt bekommt
 // @author       itsDreyter
 // @match        https://www.leitstellenspiel.de/
@@ -76,6 +76,10 @@
             }
             else //create element
             {
+                var mission_type_id = Missions[i].getAttribute('mission_type_id');
+
+                if(mission_type_id == 'null') continue;
+
                 var div_elem = document.createElement('div');
                 var html_str = '';
 
@@ -101,6 +105,10 @@
         // add info to every mission
         for (var i = 0; i < Missions.length; i++)
         {
+            var mission_type_id = Missions[i].getAttribute('mission_type_id');
+
+            if (mission_type_id == 'null') continue;
+
             // init credits
             var credits = 0;
 
